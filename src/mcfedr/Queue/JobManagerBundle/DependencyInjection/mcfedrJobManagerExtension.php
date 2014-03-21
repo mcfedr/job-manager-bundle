@@ -23,13 +23,18 @@ class mcfedrJobManagerExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setDefinition('mcfedr_job_manager.manager', new Definition('mcfedr\Queue\JobManagerBundle\Manager\JobManager', [
+        $container->setDefinition('mcfedr_job_manager.jobs', new Definition('mcfedr\Queue\JobManagerBundle\Manager\JobManager', [
             new Reference("mcfedr_queue_manager." . $config['manager'])
         ]));
 
-        $container->setDefinition('mcfedr_job_manager.command.worker', (new Definition('mcfedr\Queue\JobManagerBundle\Command\WorkerCommand', [
+        $container->setDefinition('mcfedr_job_manager.workers', new Definition('mcfedr\Queue\JobManagerBundle\Manager\WorkerManager', [
             new Reference("mcfedr_queue_manager." . $config['manager']),
+            new Reference('service_container')
+        ]));
+
+        $container->setDefinition('mcfedr_job_manager.command.worker', (new Definition('mcfedr\Queue\JobManagerBundle\Command\WorkerCommand', [
+            new Reference('mcfedr_job_manager.workers'),
             new Reference("logger")
-        ]))->setTags(['console.command']));
+        ]))->addTag('console.command'));
     }
 }
