@@ -46,7 +46,7 @@ class WorkerCommand extends Command
         while(true) {
             try {
                 $this->logger->debug('Waiting for task');
-                $this->manager->execute();
+                $this->manager->execute(null, 30);
                 $this->logger->debug('Task complete');
             }
             catch (ExecuteException $e) {
