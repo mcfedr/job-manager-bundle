@@ -29,7 +29,8 @@ class mcfedrJobManagerExtension extends Extension
 
         $container->setDefinition('mcfedr_job_manager.workers', new Definition('mcfedr\Queue\JobManagerBundle\Manager\WorkerManager', [
             new Reference("mcfedr_queue_manager." . $config['manager']),
-            new Reference('service_container')
+            new Reference('service_container'),
+            new Reference("logger")
         ]));
 
         $container->setDefinition('mcfedr_job_manager.command.worker', (new Definition('mcfedr\Queue\JobManagerBundle\Command\WorkerCommand', [

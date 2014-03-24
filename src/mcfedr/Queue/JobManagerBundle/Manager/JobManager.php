@@ -29,7 +29,7 @@ class JobManager
      * @param \DateTime $when Optionally set a time in the future when this task should happen
      * @return Job
      */
-    public function putTask($name, array $options = null, $queue = null, $priority = null, $when = null)
+    public function put($name, array $options = null, $queue = null, $priority = null, $when = null)
     {
         $this->manager->put(json_encode([
             'name' => $name,

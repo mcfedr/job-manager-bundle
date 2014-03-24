@@ -8,6 +8,7 @@ namespace mcfedr\Queue\JobManagerBundle\Manager;
 use mcfedr\Queue\JobManagerBundle\Exception\ExecuteException;
 use mcfedr\Queue\JobManagerBundle\Worker\Worker;
 use mcfedr\Queue\QueueManagerBundle\Manager\QueueManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 class WorkerManager
@@ -22,10 +23,16 @@ class WorkerManager
      */
     protected $container;
 
-    public function __construct(QueueManager $manager, Container $container)
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    public function __construct(QueueManager $manager, Container $container, LoggerInterface $logger)
     {
         $this->manager = $manager;
         $this->container = $container;
+        $this->logger = $logger;
     }
 
     /**
@@ -37,7 +44,14 @@ class WorkerManager
     public function execute($queue = null)
     {
         $job = $this->manager->get($queue);
-        $task = json_decode($job->getData());
+        if (!$job) {
+            return;
+        }
+        $task = json_decode($job->getData(), true);
+        $this->logger->info('Got task', [
+            'task' => $task['name'],
+            'options' => $task['options']
+        ]);
 
         try {
             /** @var Worker $task */
