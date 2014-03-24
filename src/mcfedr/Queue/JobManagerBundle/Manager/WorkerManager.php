@@ -39,11 +39,12 @@ class WorkerManager
      * Execute the next task on the queue
      *
      * @param string $queue
+     * @param int $timeout
      * @throws \mcfedr\Queue\JobManagerBundle\Exception\ExecuteException
      */
-    public function execute($queue = null)
+    public function execute($queue = null, $timeout = null)
     {
-        $job = $this->manager->get($queue);
+        $job = $this->manager->get($queue, $timeout);
         if (!$job) {
             return;
         }
