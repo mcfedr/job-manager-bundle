@@ -7,6 +7,12 @@ namespace mcfedr\Queue\JobManagerBundle\Exception;
 
 use mcfedr\Queue\QueueManagerBundle\Queue\Job;
 
+/**
+ * Thrown by the WorkerManager when there was a problem running a job.
+ * This Exception will be wrapped around the original exception
+ *
+ * @package mcfedr\Queue\JobManagerBundle\Exception
+ */
 class ExecuteException extends \Exception
 {
     /**

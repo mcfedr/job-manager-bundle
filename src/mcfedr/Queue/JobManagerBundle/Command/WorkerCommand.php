@@ -6,6 +6,7 @@
 namespace mcfedr\Queue\JobManagerBundle\Command;
 
 use mcfedr\Queue\JobManagerBundle\Exception\ExecuteException;
+use mcfedr\Queue\JobManagerBundle\Exception\UnrecoverableException;
 use mcfedr\Queue\JobManagerBundle\Manager\WorkerManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -48,6 +49,11 @@ class WorkerCommand extends Command
                 $this->logger->debug('Waiting for task');
                 $this->manager->execute(null, 30);
                 $this->logger->debug('Task complete');
+            }
+            catch (UnrecoverableException $e) {
+                $this->logger->error('There was an error running the task, that cannot be recovered', [
+                    'e' => $e
+                ]);
             }
             catch (ExecuteException $e) {
                 $this->logger->error('There was an error running the task', [
