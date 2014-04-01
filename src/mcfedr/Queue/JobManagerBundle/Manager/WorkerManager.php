@@ -7,6 +7,8 @@ namespace mcfedr\Queue\JobManagerBundle\Manager;
 
 use mcfedr\Queue\JobManagerBundle\Exception\ExecuteException;
 use mcfedr\Queue\JobManagerBundle\Exception\UnrecoverableException;
+use mcfedr\Queue\JobManagerBundle\Listener\PostListener;
+use mcfedr\Queue\JobManagerBundle\Listener\PreListener;
 use mcfedr\Queue\JobManagerBundle\Worker\Worker;
 use mcfedr\Queue\QueueManagerBundle\Manager\QueueManager;
 use Psr\Log\LoggerInterface;
@@ -30,11 +32,31 @@ class WorkerManager
      */
     protected $logger;
 
+    /**
+     * @var PreListener[]
+     */
+    protected $preListeners = [];
+
+    /**
+     * @var PostListener[]
+     */
+    protected $postListeners = [];
+
     public function __construct(QueueManager $manager, Container $container, LoggerInterface $logger)
     {
         $this->manager = $manager;
         $this->container = $container;
         $this->logger = $logger;
+    }
+
+    public function addPreListener(PreListener $listener)
+    {
+        $this->preListeners[] = $listener;
+    }
+
+    public function addPostListener(PostListener $listener)
+    {
+        $this->postListeners[] = $listener;
     }
 
     /**
@@ -59,10 +81,19 @@ class WorkerManager
         ]);
 
         try {
-            /** @var Worker $task */
+            /** @var Worker $worker */
             $worker = $this->container->get($task['name']);
 
+            foreach ($this->preListeners as $listener) {
+                $listener->preTask($worker, $task['options']);
+            }
+
             $worker->execute($task['options']);
+
+            foreach ($this->postListeners as $listener) {
+                $listener->postTask($worker, $task['options']);
+            }
+
             $this->manager->delete($job);
         }
         catch (ServiceNotFoundException $e) {

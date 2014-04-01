@@ -2,6 +2,7 @@
 
 namespace mcfedr\Queue\JobManagerBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -23,19 +24,31 @@ class mcfedrJobManagerExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setDefinition('mcfedr_job_manager.jobs', new Definition('mcfedr\Queue\JobManagerBundle\Manager\JobManager', [
-            new Reference("mcfedr_queue_manager." . $config['manager'])
-        ]));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
 
-        $container->setDefinition('mcfedr_job_manager.workers', new Definition('mcfedr\Queue\JobManagerBundle\Manager\WorkerManager', [
-            new Reference("mcfedr_queue_manager." . $config['manager']),
-            new Reference('service_container'),
-            new Reference("logger")
-        ]));
+        $container->setDefinition(
+            'mcfedr_job_manager.jobs',
+            new Definition('mcfedr\Queue\JobManagerBundle\Manager\JobManager', [
+                new Reference("mcfedr_queue_manager." . $config['manager'])
+            ])
+        );
 
-        $container->setDefinition('mcfedr_job_manager.command.worker', (new Definition('mcfedr\Queue\JobManagerBundle\Command\WorkerCommand', [
-            new Reference('mcfedr_job_manager.workers'),
-            new Reference("logger")
-        ]))->addTag('console.command'));
+        $container->setDefinition(
+            'mcfedr_job_manager.workers',
+            new Definition('mcfedr\Queue\JobManagerBundle\Manager\WorkerManager', [
+                new Reference("mcfedr_queue_manager." . $config['manager']),
+                new Reference('service_container'),
+                new Reference("logger")
+            ])
+        );
+
+        $container->setDefinition(
+            'mcfedr_job_manager.command.worker',
+            (new Definition('mcfedr\Queue\JobManagerBundle\Command\WorkerCommand', [
+                new Reference('mcfedr_job_manager.workers'),
+                new Reference("logger")
+            ]))->addTag('console.command')
+        );
     }
 }

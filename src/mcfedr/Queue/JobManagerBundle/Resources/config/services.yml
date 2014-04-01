@@ -1,0 +1,17 @@
+services:
+    mcfedr_job_manager.listener.doctrine:
+        class: mcfedr\Queue\JobManagerBundle\Listener\DoctrineListener
+        arguments:
+            - "@logger"
+            - "@?database_connection"
+        tags:
+            -  { name: mcfedr_job_manager.listener.pre }
+
+    mcfedr_job_manager.listener.mailer:
+        class: mcfedr\Queue\JobManagerBundle\Listener\MailerListener
+        arguments:
+            - "@logger"
+            - "@?mailer"
+            - "@?swiftmailer.transport.real"
+        tags:
+            -  { name: mcfedr_job_manager.listener.post }
