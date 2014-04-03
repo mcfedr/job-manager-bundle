@@ -39,6 +39,7 @@ class MailerListener implements PostListener
             if ($this->mailer && $this->transport) {
                 //Flush the mailer queue, this isn't normally done until the command execution finishes
                 $this->mailer->getTransport()->getSpool()->flushQueue($this->transport);
+                $this->transport->stop();
                 $this->logger->info('Flushed mail queue');
             }
         }
