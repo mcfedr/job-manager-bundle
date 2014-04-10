@@ -39,7 +39,8 @@ class WorkerCommand extends Command
         $this
             ->setName('mcfedr:job:worker')
             ->setDescription('Run a worker process')
-            ->addOption('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to run tasks from');
+            ->addOption('queue', null, InputOption::VALUE_OPTIONAL, 'The queue to run tasks from', null)
+            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'The timeout to wait for a task', 30);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -47,7 +48,7 @@ class WorkerCommand extends Command
         while(true) {
             try {
                 $this->logger->debug('Waiting for task');
-                $this->manager->execute(null, 30);
+                $this->manager->execute($input->getOption('queue'), $input->getOption('timeout'));
                 $this->logger->debug('Task complete');
             }
             catch (UnrecoverableException $e) {
