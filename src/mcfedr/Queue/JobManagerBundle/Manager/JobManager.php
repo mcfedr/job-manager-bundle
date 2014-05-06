@@ -5,6 +5,7 @@
 
 namespace mcfedr\Queue\JobManagerBundle\Manager;
 
+use mcfedr\Queue\QueueManagerBundle\Exception\WrongJobException;
 use mcfedr\Queue\QueueManagerBundle\Manager\QueueManager;
 use mcfedr\Queue\QueueManagerBundle\Queue\Job;
 
@@ -36,5 +37,16 @@ class JobManager
             'name' => $name,
             'options' => $options
         ]), $queue, $priority, $when);
+    }
+
+    /**
+     * Remove a job
+     *
+     * @param $job
+     * @throws WrongJobException
+     */
+    public function delete(Job $job)
+    {
+        $this->manager->delete($job);
     }
 }
