@@ -6,6 +6,7 @@
 namespace mcfedr\Queue\JobManagerBundle\Manager;
 
 use mcfedr\Queue\QueueManagerBundle\Exception\WrongJobException;
+use mcfedr\Queue\QueueManagerBundle\Exception\NoSuchJobException;
 use mcfedr\Queue\QueueManagerBundle\Manager\QueueManager;
 use mcfedr\Queue\QueueManagerBundle\Queue\Job;
 
@@ -44,6 +45,7 @@ class JobManager
      *
      * @param $job
      * @throws WrongJobException
+     * @throws NoSuchJobException
      */
     public function delete(Job $job)
     {
