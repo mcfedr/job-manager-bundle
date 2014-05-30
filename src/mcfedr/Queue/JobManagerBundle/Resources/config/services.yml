@@ -4,6 +4,7 @@ services:
         arguments:
             - "@logger"
             - "@?database_connection"
+            - "@?doctrine"
         tags:
             -  { name: mcfedr_job_manager.listener.pre }
 

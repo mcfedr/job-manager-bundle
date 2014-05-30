@@ -12,11 +12,16 @@ use mcfedr\Queue\JobManagerBundle\Worker\DoctrineAwareWorker;
 use mcfedr\Queue\JobManagerBundle\Worker\Worker;
 use Psr\Log\LoggerInterface;
 
-class DoctrineListener implements PreListener
+class DoctrineListener implements PreListener, PostListener
 {
 
     /**
      * @var Connection
+     */
+    protected $connection;
+
+    /**
+     * @var Registry
      */
     protected $doctrine;
 
@@ -25,18 +30,19 @@ class DoctrineListener implements PreListener
      */
     protected $logger;
 
-    public function __construct(LoggerInterface $logger, Connection $doctrine = null)
+    public function __construct(LoggerInterface $logger, Connection $connection = null, Registry $doctrine = null)
     {
         $this->logger = $logger;
+        $this->connection = $connection;
         $this->doctrine = $doctrine;
     }
 
     public function preTask(Worker $worker, array $options = null)
     {
         if ($worker instanceof DoctrineAwareWorker) {
-            if ($this->doctrine) {
+            if ($this->connection) {
                 try {
-                    $this->doctrine->executeQuery('SELECT 1');
+                    $this->connection->executeQuery('SELECT 1');
                 } catch (DBALException $e) {
                     if ($e->getPrevious()->getCode() == "HY000") {
                         $this->logger->info(
@@ -45,12 +51,21 @@ class DoctrineListener implements PreListener
                                 'e' => $e
                             ]
                         );
-                        $this->doctrine->close();
+                        $this->connection->close();
                     }
                     else {
                         throw $e;
                     }
                 }
+            }
+        }
+    }
+
+    public function postTask(Worker $worker, array $options = null)
+    {
+        if ($worker instanceof DoctrineAwareWorker) {
+            if ($this->doctrine) {
+                $this->doctrine->getManager()->clear();
             }
         }
     }

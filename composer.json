@@ -9,7 +9,9 @@
         "mcfedr/queue-manager-bundle": "~1.2"
     },
     "require-dev": {
-        "mcfedr/queue-driver-pheanstalk-bundle": "~1.2"
+        "mcfedr/queue-driver-pheanstalk-bundle": "~1.2",
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/doctrine-bundle": "~1.2"
     },
     "license": "MIT",
     "authors": [
